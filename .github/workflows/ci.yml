@@ -1,4 +1,4 @@
-name: CI Pipeline
+name: CI Pipeline with ChatOps
 
 on:
   push:
@@ -10,14 +10,28 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v3
+      - name: Checkout Repository
+        uses: actions/checkout@v3
 
-    - name: Display Files
-      run: ls -la
+      - name: Display Files
+        run: ls -la
 
-    - name: Simulate Build Step
-      run: echo "Build successful!"
+      - name: Simulate Build Step
+        run: echo "Build successful!"
 
-    - name: Simulate Test Step
-      run: echo "Tests passed!"
+      - name: Simulate Test Step
+        run: echo "Tests passed!"
+
+      - name: Slack Notification on Success
+        if: success()
+        run: |
+          curl -X POST -H "Content-type: application/json" \
+          --data '{"text":"✅ CI Build Successful for devops-webapp"}' \
+          ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Slack Notification on Failure
+        if: failure()
+        run: |
+          curl -X POST -H "Content-type: application/json" \
+          --data '{"text":"❌ CI Build Failed for devops-webapp"}' \
+          ${{ secrets.SLACK_WEBHOOK_URL }}
